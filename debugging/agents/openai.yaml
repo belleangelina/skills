@@ -1,0 +1,4 @@
+interface:
+  display_name: "Debugging"
+  short_description: "定位、修复bug时使用"
+  default_prompt: "使用 $debugging 定位、修复bug。"

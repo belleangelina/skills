@@ -1,0 +1,4 @@
+interface:
+  display_name: "Windows DOCX Rendering"
+  short_description: "Safely render and inspect DOCX files with LibreOffice on Windows"
+  default_prompt: "Use $windows-docx-rendering to render and inspect this DOCX safely on Windows."

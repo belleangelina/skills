@@ -1,0 +1,4 @@
+interface:
+  display_name: "远程设备验证"
+  short_description: "远程嵌入式设备验证流程、部署选择、输入确认与日志控制"
+  default_prompt: "使用 $remote-device-validation 规划远程设备验证；先确认输入文件路径，默认 docs/remote-device-validation-inputs.md。"

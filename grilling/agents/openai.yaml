@@ -1,0 +1,4 @@
+interface:
+  display_name: "需求追问"
+  short_description: "围绕需求和实现方案追问。"
+  default_prompt: "使用 $grilling，围绕需求和实现方案向我追问，帮我逐步梳理需求并确定实现方案。"

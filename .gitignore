@@ -1,0 +1,7 @@
+.system/
+hatch-pet/
+*.zip
+
+.DS_Store
+Thumbs.db
+

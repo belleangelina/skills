@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alcor 远程工作区"
+  short_description: "为映射项目统一分流本地编辑与 SSH Git、Linux 检查、构建"
+  default_prompt: "Use $alcor-remote-workspace to handle this Alcor mapped-workspace task with the correct local or SSH execution path."
