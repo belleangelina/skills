@@ -1,20 +1,26 @@
 ---
 name: browser-timeout-guard
-description: Check and repair the local Codex Chrome plugin timeout workaround before external-browser automation. Use on this Windows machine before the first chrome:control-chrome or other external Chrome/Edge extension operation in a session, after Codex/plugin updates, or whenever external-browser commands repeatedly take about 10–20 seconds or time out. Do not use for browser:control-in-app-browser operations.
+description: Check the local timeout workaround before external Chrome/Edge extension automation on this Windows machine, and diagnose recurring 10–20 second timeouts. Use read-only detection first; repair only a confirmed affected runtime with recognized code patterns. Do not use for the in-app browser.
 ---
 
 # Browser Timeout Guard
 
-Run the deterministic preflight before the first external Chrome/Edge browser operation in each Codex session. Do not run it for the in-app Browser:
+Before the first external Chrome/Edge extension operation in a session, run read-only detection. Repeat only after a plugin update or a new timeout symptom:
 
 ```powershell
-& "$env:USERPROFILE\.codex\skills\browser-timeout-guard\scripts\Repair-BrowserTimeout.ps1"
+& "$env:USERPROFILE\.codex\skills\browser-timeout-guard\scripts\Repair-BrowserTimeout.ps1" -CheckOnly
 ```
 
-The script scans installed `openai-bundled/browser` and `openai-bundled/chrome` plugin versions, repairs known timeout-causing code paths, creates one original backup beside every changed bundle, and validates JavaScript syntax. It keeps the site-status safety request but bounds an unavailable request to 1.5 seconds, using the plugin's existing fail-open path instead of disabling the check.
+The script scans legacy `openai-bundled/browser` and `openai-bundled/chrome` bundles. Its scan does not establish which runtime the current browser tool actually uses. Identify the active runtime from the tool/plugin metadata before interpreting a match as relevant.
 
-After a successful preflight, continue with the requested external-browser task. Do not run a separate browser latency probe: the user's first requested external-browser operation is the functional check.
+- `OK`: continue the requested browser operation.
+- `NEEDS_REPAIR` (exit 2): inspect the reported bundle and verify the active runtime uses it and matches the known affected code. A match in an unused cached version is not a reason to repair. If the metadata does not identify the active version/path, or the association cannot be established from available evidence, leave the cache unchanged and proceed with the user's requested browser operation. Investigate the runtime further only if that operation actually fails or times out; missing metadata alone must not block browser work.
+- `UNSUPPORTED` or no legacy bundle (exit 3): this does not prove the active browser is broken. Continue a normal requested operation when its tool is available. If it fails, diagnose the active runtime and preserve the unsupported bundle.
 
-If the script reports `RESTART_REQUIRED`, ask the user to restart Codex before browser work because the loaded runtime may still contain the old bundle. If it reports an unsupported bundle layout, stop modifying that bundle, inspect the new code structure, and update the script with narrowly scoped patterns. Never remove or unconditionally bypass URL safety checks.
+Do not run the script in mutation mode against the entire default cache: it can change multiple versions and partially modify unsupported bundles. For a confirmed affected active version, stage only that version under a task-local cache with the same `<browser-or-chrome>/<version>/scripts/` layout. Use `-PluginCacheRoot <staged-cache>` with `-CheckOnly` first, then without `-CheckOnly` only if all staged targets are recognized. Review the diff and JavaScript syntax, recheck that the active original has not changed, preserve its original backup, and apply only the verified repair to that version. Never edit unrelated cached versions.
 
-Use `-CheckOnly` for diagnosis without changing files. Use `-PluginCacheRoot <path>` only for isolated testing.
+The known workaround bounds an unavailable site-status request to 1.5 seconds using the existing fail-open path. Preserve URL safety checks; never remove or unconditionally bypass them. Unknown code layouts require diagnosis and narrowly scoped validation before any repair, not automatic pattern expansion during an unrelated browser task.
+
+If the active loaded bundle was changed and requires a restart, explain the affected path and why a restart is necessary before asking the user to restart Codex. A `RESTART_REQUIRED` message from a staged copy alone does not mean the active runtime changed.
+
+Use the user's requested browser operation as the functional check; do not add a separate latency probe after a successful check or repair.

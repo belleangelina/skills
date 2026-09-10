@@ -1,4 +1,4 @@
 interface:
   display_name: "浏览器超时守卫"
-  short_description: "在浏览器操作前检查并修复本机 Browser/Chrome 插件超时补丁"
-  default_prompt: "使用 $browser-timeout-guard 检查并修复 Browser/Chrome 插件超时。"
+  short_description: "外部浏览器操作前只读检查超时补丁，仅修复已确认受影响的运行时"
+  default_prompt: "使用 $browser-timeout-guard 先只读检查 Browser/Chrome 超时问题，仅在确认当前运行时受影响时进行针对性修复。"
